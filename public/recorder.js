@@ -1,6 +1,7 @@
 (function(window) {
-  var client = new BinaryClient('ws://localhost:9001');
-
+  // var client = new BinaryClient(location.origin.replace(/^http/, 'ws') + '/binary-endpoint');
+  var host = location.origin.replace(/^http/, 'ws') + '/binary-endpoint';
+  var client = new BinaryClient(host);
   client.on('open', function() {
     window.Stream = client.createStream();
 
@@ -32,6 +33,8 @@
       // the sample rate is in context.sampleRate
       audioInput = context.createMediaStreamSource(e);
 
+      console.log(context.sampleRate);
+
       var bufferSize = 2048;
       recorder = context.createScriptProcessor(bufferSize, 1, 1);
 
@@ -43,7 +46,7 @@
       }
 
       audioInput.connect(recorder)
-      recorder.connect(context.destination); 
+      recorder.connect(context.destination);
     }
 
     function convertoFloat32ToInt16(buffer) {

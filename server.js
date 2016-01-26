@@ -1,27 +1,22 @@
 var http = require('http');
-var express = require('express');
-var BinaryServer = require('binaryjs').BinaryServer;
 var fs = require('fs');
-var wav = require('wav');
+var server = http.createServer(function (req, res) {
+  fs.readFile(__dirname + '/public/' + req.url, function (err,data) {
+    if (err) {
+      res.writeHead(404);
+      res.end(JSON.stringify(err));
+      return;
+    }
+    res.writeHead(200);
+    res.end(data);
+  });
+}).listen(9000);
 
-var port = 3700;
-var outFile = 'demo.wav';
-var app = express();
-// create a server with the express app as a listener
-var server = http.createServer(app).listen(8000);
+var BinaryServer = require('binaryjs').BinaryServer,
+    fs = require('fs');
 
-app.set('views', __dirname + '/tpl');
-app.set('view engine', 'jade');
-app.engine('jade', require('jade').__express);
-app.use(express.static(__dirname + '/public'))
-
-app.get('/', function(req, res){
-  res.render('index');
-});
-
-console.log('server open on port ' + port);
-
-binaryServer = BinaryServer({server: server, path: '/binary-endpoint'});
+// Create a BinaryServer attached to our existing server
+var binaryServer = new BinaryServer({server: server, path: '/binary-endpoint'});
 
 var importantStream = null;
 
